@@ -7,23 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using MeuTrabalho.Models;
 using System.Data.SqlClient;
 using MeuTrabalho.Repositories;
+using MeuTrabalho.Repositories.Interface;
+using Microsoft.Extensions.Configuration;
 
 namespace MeuTrabalho.Controllers
 {
     public class HomeController : Controller, IDisposable
     {
-        static SqlConnection _globalConnection = null;
-        readonly LogRepository logRepository;
+        private readonly ILogRepository _logRepository;
 
-        public HomeController()
+        public HomeController(ILogRepository logRepository)
         {
-            if(_globalConnection == null)
-            {
-                _globalConnection = new SqlConnection("Server=martedb.database.windows.net;Database=sql7;User=app;Password=homework-ago21;Max Pool Size=2");
-                _globalConnection.Open();
-            }
-
-            logRepository = new LogRepository(_globalConnection);
+            _logRepository = logRepository;
         }
 
         public IActionResult Index()
@@ -48,18 +43,12 @@ namespace MeuTrabalho.Controllers
             {
                 if (teste == "")
                 {
-                    teste = logRepository.TotalRegistros().ToString();
+                    teste = _logRepository.TotalRegistros().ToString();
                 }
 
                 ViewData["Message"] = "Total de acessos: " + teste;
 
-                SqlCommand sql = new SqlCommand("INSERT tbLog VALUES ('about')", _globalConnection);
-                var retorno = sql.ExecuteReader();   
-                
-                if( retorno == null )
-                {
-                    return RedirectToAction("RETORNO NULO");
-                }
+                _logRepository.InsereLog("about");
             }
             catch(Exception ex)
             {
@@ -75,12 +64,7 @@ namespace MeuTrabalho.Controllers
 
             try
             {
-                SqlConnection conn1 = _globalConnection;
-
-                SqlCommand sql = new SqlCommand("INSERT tbLog VALUES ('contact')");
-                sql.Connection = conn1;
-
-                sql.ExecuteScalar();
+                _logRepository.InsereLog("contact");
             }
             catch(OutOfMemoryException ex)
             {

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MeuTrabalho.Repositories;
+using MeuTrabalho.Repositories.Interface;
 
 namespace MeuTrabalho
 {
@@ -24,6 +26,8 @@ namespace MeuTrabalho
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddTransient<ILogRepository, LogRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

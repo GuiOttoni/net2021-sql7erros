@@ -11,6 +11,7 @@ namespace MeuTrabalho.Controllers
 {
     public class AccountController : Controller
     {
+        
         [HttpGet]
         public IActionResult Index()
         {
@@ -23,7 +24,7 @@ namespace MeuTrabalho.Controllers
         {
             try
             {
-                SqlConnection connection = new SqlConnection("Server=martedb.database.windows.net;Database=sql7;User=aclogin;Password=homework-ago21");
+                SqlConnection connection = new SqlConnection();
                 SqlCommand cmd = new SqlCommand($"SELECT username FROM tbLogin WHERE email='" + model.Email + "' AND pwd='" + model.Password + "'", connection);
 
                 connection.Open();

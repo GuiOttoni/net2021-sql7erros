@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MeuTrabalho.Repositories.Interface;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -6,29 +8,51 @@ using System.Threading.Tasks;
 
 namespace MeuTrabalho.Repositories
 {
-    public class LogRepository
+    public class LogRepository : ILogRepository
     {
-        SqlConnection _connection;
+        private readonly IConfiguration _configuration;
 
-        public LogRepository(SqlConnection connection)
+        public LogRepository(IConfiguration configuration)
         {
-            this._connection = connection;
+            _configuration = configuration;
+        }
+
+        public void InsereLog(string pagina)
+        {
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("BancoTeste")))
+            {
+                connection.Open();
+                string query = "INSERT tbLog VALUES (@pagina)";
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.Add(new SqlParameter("@pagina", pagina));
+                    command.ExecuteScalar();
+                }
+            }
         }
 
         public int TotalRegistros()
         {
             try
             {
-                SqlCommand command = new SqlCommand("SELECT * FROM tbLog ORDER BY 1", this._connection);
-
-                var reader = command.ExecuteReader();
                 int total = 0;
-                while (reader.Read())
-                {
-                    total = total + 1;
-                }
 
-                reader.Close();
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("BancoTeste")))
+                {
+                    connection.Open();
+                    string query = "SELECT * FROM tbLog ORDER BY 1";
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        using(var reader = command.ExecuteReader())
+                        {
+                            
+                            while (reader.Read())
+                            {
+                                total = total + 1;
+                            }
+                        }
+                    }
+                }
 
                 return total;
             }
