@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MeuTrabalho.Models;
 using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using MeuTrabalho.Repositories.Interface;
 
 namespace MeuTrabalho.Controllers
 {
     public class AccountController : Controller
     {
-        
+        private readonly IAccountRepository _accountRepository;
+        public AccountController(IAccountRepository accountRepository)
+        {
+            _accountRepository = accountRepository;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -24,12 +31,7 @@ namespace MeuTrabalho.Controllers
         {
             try
             {
-                SqlConnection connection = new SqlConnection();
-                SqlCommand cmd = new SqlCommand($"SELECT username FROM tbLogin WHERE email='" + model.Email + "' AND pwd='" + model.Password + "'", connection);
-
-                connection.Open();
-                string username = (string)cmd.ExecuteScalar().ToString();
-                connection.Close();
+                var username = _accountRepository.Login(model.Email, model.Password);
 
                 return Redirect($"/Home/Dashboard?name={username}");
             }

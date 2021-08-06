@@ -33,33 +33,27 @@ namespace MeuTrabalho.Repositories
 
         public int TotalRegistros()
         {
-            try
-            {
-                int total = 0;
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("BancoTeste")))
+            int total = 0;
+
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("BancoTeste")))
+            {
+                connection.Open();
+                string query = "SELECT * FROM tbLog ORDER BY 1";
+                using (var command = new SqlCommand(query, connection))
                 {
-                    connection.Open();
-                    string query = "SELECT * FROM tbLog ORDER BY 1";
-                    using (var command = new SqlCommand(query, connection))
+                    using (var reader = command.ExecuteReader())
                     {
-                        using(var reader = command.ExecuteReader())
+
+                        while (reader.Read())
                         {
-                            
-                            while (reader.Read())
-                            {
-                                total = total + 1;
-                            }
+                            total = total + 1;
                         }
                     }
                 }
+            }
 
-                return total;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            return total;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace MeuTrabalho.Controllers
             }
             catch(Exception ex)
             {
-                ViewData["Message"] = "ERROR ABOUT";
+                throw ex;
             }
 
             return View();
@@ -66,14 +66,8 @@ namespace MeuTrabalho.Controllers
             {
                 _logRepository.InsereLog("contact");
             }
-            catch(OutOfMemoryException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction("Error");
-            }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 throw ex;
             }
 
